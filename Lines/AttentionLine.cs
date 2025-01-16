@@ -1,6 +1,6 @@
 ﻿namespace Leetcode;
 
-public class WarningLine : ILine
+public class AttentionLine : ILine
 {
     public int Left => 0;
     public int Top => 0;

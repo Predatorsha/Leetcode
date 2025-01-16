@@ -15,7 +15,7 @@ public partial class Program
     private static partial Regex SignedNumbersRegex();
     
     private static readonly ILine PromptLine = new PromptLine();
-    private static readonly ILine WarningLine = new WarningLine();
+    private static readonly ILine AttentionLine = new AttentionLine();
     private static readonly ILine MParameterLine = new MParameterLine();
     private static readonly ILine NParameterLine = new NParameterLine();
     private static readonly ILine Nums1Line = new Nums1Line();
@@ -27,11 +27,18 @@ public partial class Program
         var(m, n) = FillNumberOfArrayElements();
         var nums1 = FillElementOfArray("nums1", m, n);
         var nums2 = FillElementOfArray("nums2", n);
+
+        Merge(nums1, m, nums2, n);
         
-
-
-        var result = Merge(nums1, m, nums2, n);
-        ResultLine.Render(result);
+        AttentionLine.Render("Нажмите Enter или Escape что бы выйти");
+        while (true)
+        {
+            var key = Console.ReadKey(true);
+            if (key.Key is ConsoleKey.Enter or ConsoleKey.Escape)
+            {
+                break;
+            }
+        }
     }
 
     private static (int m, int n) FillNumberOfArrayElements()
@@ -47,10 +54,10 @@ public partial class Program
             var sum = m + n;
             if (sum is < 1 or > 200)
             {
-                WarningLine.Render("Сумма m и n должна быть в диапозоне от 1 до 200");
+                AttentionLine.Render("Сумма m и n должна быть в диапозоне от 1 до 200");
                 continue;
             }
-            WarningLine.Clear();
+            AttentionLine.Clear();
             
             MParameterLine.Render($"{mString} = {m}");
             NParameterLine.Render($"{nString} = {n}");
@@ -68,11 +75,11 @@ public partial class Program
             var numberOfArrayElements = (int)InputElements(parameterName, true);
             if (numberOfArrayElements is < 0 or > 200)
             {
-                WarningLine.Render(outOfRangeWarning);
+                AttentionLine.Render(outOfRangeWarning);
                 continue;
             }
             
-            WarningLine.Clear();
+            AttentionLine.Clear();
             return numberOfArrayElements;
         }
     }
@@ -80,10 +87,9 @@ public partial class Program
     private static double[] FillElementOfArray(string parameterName, int validCount, int zeroCount = 0)
     {
         var outOfRangeWarning = $"Элемент массива {parameterName} должен быть в диапозоне от -10\u2079 до 10\u2079";
-        var nonDecreasingOrderWarning = $"Каждый следующий элемент массива {parameterName} должен быть больше предидущего";
         
         var array =  new double[validCount + zeroCount];
-        
+
         for (var i = 0; i < validCount; i++)
         {
             Double elementOfArray;
@@ -92,55 +98,36 @@ public partial class Program
                 elementOfArray = InputElements(parameterName, false);
                 if (elementOfArray is < -1e9 or > 1e9)
                 {
-                    WarningLine.Render(outOfRangeWarning);
+                    AttentionLine.Render(outOfRangeWarning);
                     continue;
                 }
                 if (i > 0 && array[i - 1] > elementOfArray)
                 {
-                    WarningLine.Render(nonDecreasingOrderWarning);
+                    AttentionLine.Render($"Следующий элемент массива должен быть больше {array[i - 1]}");
                     continue;
                 }
                 break;
             }
 
-            WarningLine.Clear();
+            AttentionLine.Clear();
             array[i] = elementOfArray;
-            RenderArray(parameterName, array);
+            
+            AttentionLine.Render(Helper.ConvertArrayToString(array));
         }
         
-        var finishedArray = RenderArray(parameterName, array);
+        var finishedArray = Helper.ConvertArrayToString(array);
         switch (parameterName)
         {
             case "nums1":
-                Nums1Line.Render(finishedArray);
+                Nums1Line.Render("nums1 = " + finishedArray);
                 break;
             case "nums2":
-                Nums2Line.Render(finishedArray);
+                Nums2Line.Render("nums2 = " + finishedArray);
                 break;
         }
         
         return array;
     }
-
-    private static string RenderArray(string parameterName, double[] array)
-    {
-        var sb = new StringBuilder();
-        sb.Append('[');
-
-        foreach (var t in array)
-        {
-            sb.Append(t);
-            sb.Append(',');
-        }
-        sb.Append(']');
-
-        var arrayString = sb.ToString();
-
-        WarningLine.Render(arrayString);
-
-        return arrayString;
-    }
-
 
     private static double InputElements(string parameterName, bool positivesNumbers)
     {
@@ -169,7 +156,7 @@ public partial class Program
             
             if (!regex.IsMatch(newInput) && mCharKeyInfo.Key != ConsoleKey.Enter)
             {
-                WarningLine.Render(positivesNumbers
+                AttentionLine.Render(positivesNumbers
                     ? $"{{{parameterName}}} может быть только цифрой"
                     : $"{{{parameterName}}} может быть только цифрой или минусом");
 
@@ -196,7 +183,7 @@ public partial class Program
             sb.Append(@char);
         }
         
-        WarningLine.Clear();
+        AttentionLine.Clear();
         PromptLine.Clear();
         
         var result = sb.ToString();
@@ -206,44 +193,32 @@ public partial class Program
         return number;
     }
 
-    private static string Merge(double[] nums1, int m, double[] nums2, int n)
+    private static void Merge(double[] nums1, int m, double[] nums2, int n)
     {
-        var sb = new StringBuilder();
-        
         var resultArray = new Double[m + n];
-        for (var i = 0; i <= nums1.Length; i++)
+
+        var nums1Counter = 0;
+        var nums2Counter = 0;
+
+        for (int i = 0; i < resultArray.Length; i++)
         {
-            for (var j = 0; j <= nums2.Length; j++)
+            if (nums1[nums1Counter] < nums2[nums2Counter] && nums1Counter + 1 <= m)
             {
-                if (nums1[i] < nums2[j])
-                {
-                    resultArray[i] = nums2[j];
-                    continue;
-                }
+                var nums1number = nums1[nums1Counter];
                 
-                resultArray[i] = nums1[i];
+                resultArray[i] = nums1[nums1Counter];
+                nums1Counter++;
             }
-
-            nums1 = resultArray;
-        }
-       
-        sb.Append('[');
-
-        for (var i = 0; i < nums1.Length; i++)
-        {
-            sb.Append($"{nums1[i]}");
-            if (i == nums1.Length)
+            else
             {
-                continue;
+                var nums2number = nums2[nums2Counter];
+                
+                resultArray[i] = nums2[nums2Counter];
+                nums2Counter++;
             }
-            sb.Append(',');
         }
+        nums1 = resultArray;
 
-        sb.Append(']');
-
-        var result = sb.ToString();
-        sb.Clear();
-        
-        return result;
+        ResultLine.Render("Итоговый массив: " + Helper.ConvertArrayToString(nums1));
     }
 }
