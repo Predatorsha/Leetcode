@@ -192,32 +192,58 @@ public partial class Program
         var number = int.Parse(result);
         return number;
     }
-
+    
     private static void Merge(double[] nums1, int m, double[] nums2, int n)
     {
-        var resultArray = new Double[m + n];
-
-        var nums1Counter = 0;
         var nums2Counter = 0;
 
-        for (int i = 0; i < resultArray.Length; i++)
+        for (var nums1Counter = 0; nums1Counter < nums1.Length; nums1Counter++)
         {
-            if (nums1[nums1Counter] < nums2[nums2Counter] && nums1Counter + 1 <= m)
+            if (nums2.Length == 0)
             {
-                var nums1number = nums1[nums1Counter];
-                
-                resultArray[i] = nums1[nums1Counter];
-                nums1Counter++;
+                break;
             }
-            else
+            
+            if (nums1[nums1Counter] > nums2[nums2Counter] && nums2Counter < n)
             {
-                var nums2number = nums2[nums2Counter];
-                
-                resultArray[i] = nums2[nums2Counter];
+                for (var i = m - 1 + nums2Counter ; i >= nums1Counter ; i--)
+                {
+                    nums1[i + 1] = nums1[i];
+                }
+
+                nums1[nums1Counter] = nums2[nums2Counter];
                 nums2Counter++;
             }
         }
-        nums1 = resultArray;
+
+        if (nums2.Length != 0 && nums1[^1] == 0 && nums2[^1] != 0)
+        {
+            nums1[^1] = nums2[^1];
+        }
+
+        ResultLine.Render("Итоговый массив: " + Helper.ConvertArrayToString(nums1));
+    }
+
+    private static void Merge1(double[] nums1, int m, double[] nums2, int n)
+    {
+        var lastIndexNums1 = m - 1;
+        var lastIndexNums2 = n - 1;
+        var mergePosition = m + n - 1;
+
+        while (lastIndexNums2 >= 0)
+        {
+            if (lastIndexNums1 >= 0 && nums1[lastIndexNums1] > nums2[lastIndexNums2])
+            {
+                nums1[mergePosition] = nums1[lastIndexNums1];
+                lastIndexNums1--;
+            }
+            else
+            {
+                nums1[mergePosition] = nums2[lastIndexNums2];
+                lastIndexNums2--;
+            }
+            mergePosition--;
+        }
 
         ResultLine.Render("Итоговый массив: " + Helper.ConvertArrayToString(nums1));
     }
