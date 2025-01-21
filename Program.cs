@@ -192,39 +192,8 @@ public partial class Program
         var number = int.Parse(result);
         return number;
     }
-    
+
     private static void Merge(double[] nums1, int m, double[] nums2, int n)
-    {
-        var nums2Counter = 0;
-
-        for (var nums1Counter = 0; nums1Counter < nums1.Length; nums1Counter++)
-        {
-            if (nums2.Length == 0)
-            {
-                break;
-            }
-            
-            if (nums1[nums1Counter] > nums2[nums2Counter] && nums2Counter < n)
-            {
-                for (var i = m - 1 + nums2Counter ; i >= nums1Counter ; i--)
-                {
-                    nums1[i + 1] = nums1[i];
-                }
-
-                nums1[nums1Counter] = nums2[nums2Counter];
-                nums2Counter++;
-            }
-        }
-
-        if (nums2.Length != 0 && nums1[^1] == 0 && nums2[^1] != 0)
-        {
-            nums1[^1] = nums2[^1];
-        }
-
-        ResultLine.Render("Итоговый массив: " + Helper.ConvertArrayToString(nums1));
-    }
-
-    private static void Merge1(double[] nums1, int m, double[] nums2, int n)
     {
         var lastIndexNums1 = m - 1;
         var lastIndexNums2 = n - 1;
