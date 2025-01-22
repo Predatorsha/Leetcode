@@ -3,5 +3,5 @@
 public class NParameterLine : ILine
 {
     public int Left => 0;
-    public int Top { get; set; } = 6;
+    public int Top  => 6;
 }

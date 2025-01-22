@@ -129,30 +129,41 @@ public partial class Program
         return array;
     }
 
-    private static double InputElements(string parameterName, bool positivesNumbers)
+    private static int InputElements(string parameterName, bool positivesNumbers)
     {
         var prompt = $"Введите {parameterName} = ";
-        var promptLenght = prompt.Length;
+        var promptLenght = prompt.Length;  
+        Cursor.SetPosition(promptLenght, PromptLine.Top);
+        
         var sb = new StringBuilder();
         
         PromptLine.Clear();
         PromptLine.Render(prompt);
 
-        var numberOfCharactersEntered = 0;
-
         var regex = positivesNumbers ? PositiveNumbersRegex() : SignedNumbersRegex();
 
         while (true)
         {
-            var inputCursorPositionLeft = promptLenght + numberOfCharactersEntered;
-            var inputCursorPositionTop = PromptLine.Top;
-            
-            Console.SetCursorPosition(inputCursorPositionLeft, inputCursorPositionTop);
+            Cursor.SetPosition(Cursor.Left, Cursor.Top);
             
             var mCharKeyInfo = Console.ReadKey();
             var @char = Convert.ToChar(mCharKeyInfo.KeyChar);
             
             var newInput = sb.ToString() + @char;
+            
+            switch (mCharKeyInfo.Key)
+            {
+                case ConsoleKey.A:
+                case ConsoleKey.LeftArrow:
+                    Cursor.MoveLeft(Cursor.Left); continue;
+                case ConsoleKey.D:
+                case ConsoleKey.RightArrow:
+                    Cursor.MoveRight(Cursor.Left); continue;
+                case ConsoleKey.Delete:
+                    Cursor.Delete(Cursor.Left); continue;
+                case ConsoleKey.Backspace:
+                    Cursor.Backspace(Cursor.Left); continue;
+            }
             
             if (!regex.IsMatch(newInput) && mCharKeyInfo.Key != ConsoleKey.Enter)
             {
@@ -160,8 +171,7 @@ public partial class Program
                     ? $"{{{parameterName}}} может быть только цифрой"
                     : $"{{{parameterName}}} может быть только цифрой или минусом");
 
-                Console.SetCursorPosition(inputCursorPositionLeft, inputCursorPositionTop);
-                Console.Write(" ");
+                Cursor.Backspace(Cursor.Left, Cursor.Top);
                 
                 continue;
             }
@@ -179,7 +189,7 @@ public partial class Program
                 continue;
             }
 
-            numberOfCharactersEntered++;
+            Cursor.SetPosition(Cursor.Left + 1, Cursor.Top);
             sb.Append(@char);
         }
         
