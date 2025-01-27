@@ -42,12 +42,14 @@ public static class Cursor
     
     public static void Delete(int? left = null, int? top = null)
     {
-        var leftPosition  = (left ?? Left) + 1;
+        var leftPosition  = left ?? Left;
         Left = leftPosition;
         
         var topPosition  = top ?? Top;
         Top  = topPosition;
         
         Console.Write(" ");
+        
+        Console.SetCursorPosition(leftPosition , topPosition);
     }
 }

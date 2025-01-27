@@ -129,10 +129,14 @@ public partial class Program
         return array;
     }
 
-    private static int InputElements(string parameterName, bool positivesNumbers)
+    private static double InputElements(string parameterName, bool positivesNumbers)
     {
         var prompt = $"Введите {parameterName} = ";
-        var promptLenght = prompt.Length;  
+        var promptLenght = prompt.Length;
+        
+        var charsEnteredCount  = 0;
+        var inputNumbersMaxLength = 12;
+        
         Cursor.SetPosition(promptLenght, PromptLine.Top);
         
         var sb = new StringBuilder();
@@ -145,26 +149,46 @@ public partial class Program
         while (true)
         {
             Cursor.SetPosition(Cursor.Left, Cursor.Top);
-            
-            var mCharKeyInfo = Console.ReadKey();
-            var @char = Convert.ToChar(mCharKeyInfo.KeyChar);
-            
-            var newInput = sb.ToString() + @char;
-            
-            switch (mCharKeyInfo.Key)
+
+            var mCharKeyInfo = Console.ReadKey(true);
+
+            if (PromptLine.)
             {
-                case ConsoleKey.A:
-                case ConsoleKey.LeftArrow:
-                    Cursor.MoveLeft(Cursor.Left); continue;
-                case ConsoleKey.D:
-                case ConsoleKey.RightArrow:
-                    Cursor.MoveRight(Cursor.Left); continue;
-                case ConsoleKey.Delete:
-                    Cursor.Delete(Cursor.Left); continue;
-                case ConsoleKey.Backspace:
-                    Cursor.Backspace(Cursor.Left); continue;
+                
+            }
+
+            if (mCharKeyInfo.Key is ConsoleKey.A or ConsoleKey.LeftArrow or ConsoleKey.D or ConsoleKey.RightArrow or ConsoleKey.Delete or ConsoleKey.Backspace)
+            {
+                if (mCharKeyInfo.Key is ConsoleKey.A or ConsoleKey.LeftArrow && promptLenght >= Cursor.Left || 
+                    mCharKeyInfo.Key is ConsoleKey.D or ConsoleKey.RightArrow && Cursor.Left >= promptLenght + inputNumbersMaxLength)
+                {
+                    continue;
+                }
+                
+                switch (mCharKeyInfo.Key)
+                {
+                    case ConsoleKey.A:
+                    case ConsoleKey.LeftArrow:
+                        Cursor.MoveLeft(Cursor.Left);
+                        continue;
+                    case ConsoleKey.D:
+                    case ConsoleKey.RightArrow:
+                        Cursor.MoveRight(Cursor.Left);
+                        continue;
+                    case ConsoleKey.Delete:
+                        Cursor.Delete(Cursor.Left);
+                        continue;
+                    case ConsoleKey.Backspace:
+                        Cursor.Backspace(Cursor.Left);
+                        continue;
+                }
             }
             
+            var @char = Convert.ToChar(mCharKeyInfo.KeyChar);
+            var newInput = sb.ToString() + @char;
+            
+            Console.Write(@char);
+
             if (!regex.IsMatch(newInput) && mCharKeyInfo.Key != ConsoleKey.Enter)
             {
                 AttentionLine.Render(positivesNumbers
@@ -176,7 +200,7 @@ public partial class Program
                 continue;
             }
             
-            if (mCharKeyInfo.Key == ConsoleKey.Enter)
+            if (mCharKeyInfo.Key == ConsoleKey.Enter || newInput.Length == inputNumbersMaxLength)
             {
                 if (NegativeNumbersRegex().IsMatch(newInput) && !positivesNumbers)
                 {
@@ -190,6 +214,8 @@ public partial class Program
             }
 
             Cursor.SetPosition(Cursor.Left + 1, Cursor.Top);
+            charsEnteredCount++;
+
             sb.Append(@char);
         }
         
@@ -199,7 +225,7 @@ public partial class Program
         var result = sb.ToString();
         sb.Clear();
         
-        var number = int.Parse(result);
+        var number = double.Parse(result);
         return number;
     }
 
